@@ -16,6 +16,8 @@ BLUE = (0,0,255)
 smallfont = p.font.SysFont('Corbel',35)
 quit_text = smallfont.render('quit' , True , WHITE)
 bubble_text = smallfont.render("Bubble", True, WHITE)
+insertion_text = smallfont.render("Insertion", True, WHITE)
+scramble_text = smallfont.render("Scramble", True, WHITE)
 number_of_staples = 50
 
 button_list = []
@@ -29,6 +31,14 @@ BUBBLESORT_BUTTON = Button( 150, 0, 100, 100, RED, bubble_text)
 button_list.append(BUBBLESORT_BUTTON)
 button_map[BUBBLESORT_BUTTON] = "Bubblesort"
 
+INSERTIONSORT_BUTTON = Button(300, 0, 100, 100, RED, insertion_text)
+button_list.append(INSERTIONSORT_BUTTON)
+button_map[INSERTIONSORT_BUTTON] = "Insertionsort"
+
+SCRAMBLE_BUTTON = Button(450, 0, 100,100, RED, scramble_text)
+button_list.append(SCRAMBLE_BUTTON)
+button_map[SCRAMBLE_BUTTON] = "Scramble"
+
 def create_staples(number_of_staples):
     staple_list = []
     staple_width = WIDTH/number_of_staples
@@ -38,23 +48,39 @@ def create_staples(number_of_staples):
     return staple_list
 
 def bubblesort(staple_list, screen, clock):
+
     n = len(staple_list) - 1
     for j in range(n, 0, -1):
         for i in range(j):
-            if staple_list[i].height < staple_list[i+1].height:
+            if abs(staple_list[i].height) > abs(staple_list[i+1].height):
+                #staple_list[i].color = RED
+                #staple_list[i+1].color = RED
                 staple_list[i].height, staple_list[i+1].height = staple_list[i+1].height, staple_list[i].height
             n -= 1
-            screen.fill(p.Color("Black"))
+            #time.sleep(0.1)
             draw_objects(screen, clock, button_list, staple_list)
-
+            #staple_list[i].color = BLUE
+            #staple_list[i+1].color = BLUE
     return staple_list
-     
+
+def insertionsort(staple_list, screen, clock):
+    for i in range(1, len(staple_list)):
+        key = staple_list[i].height
+        j = i - 1
+        while j >= 0 and abs(key) < abs(staple_list[j].height):
+            staple_list[j+1].height = staple_list[j].height
+            draw_objects(screen, clock, button_list, staple_list)
+            j -= 1
+        staple_list[j+1].height = key
+    return staple_list
+
 def draw_objects(screen, clock, button_list, staple_list):
     clock.tick(MAX_FPS)
     screen.fill(p.Color("Black"))
     for button in button_list:
         button.draw(screen)
     for staple in staple_list:
+        #print(abs(staple.height))
         staple.draw(screen)
     p.draw.line(screen, WHITE, (0, HEIGHT/4), (WIDTH, HEIGHT/4))
     p.display.flip()
@@ -78,12 +104,13 @@ def main():
                             action = button_map[button]
                             if action == "quit":
                                 run = False
-                            if action == "Bubblesort":
+                            elif action == "Bubblesort":
                                 staple_list = bubblesort(staple_list, screen, clock)
-
+                            elif action == "Insertionsort":
+                                staple_list = insertionsort(staple_list, screen, clock)
+                            elif action == "Scramble":
+                                staple_list = create_staples(number_of_staples)
             draw_objects(screen, clock, button_list, staple_list)
-
-
 
 if __name__ == "__main__":
     main()
